@@ -1,0 +1,56 @@
+# Claudio 个人AI电台 架构总览
+核心定位：读懂听歌习惯→规划声音→像DJ那样播报的个人AI电台，整体架构分为**4个核心层级**，从外部依赖到本地大脑、运行时聚合，最终到前端交互层，完整实现端到端的AI电台能力。
+
+---
+
+## 第一层：外部上下文层
+为系统提供基础能力、用户个性化数据与核心AI大脑支撑，是整个系统的外部依赖底座。
+| 模块名称 | 核心定位 | 核心能力/关键信息 |
+| :--- | :--- | :--- |
+| USER/ 用户品味语料 | 个性化数据底座 | 让Claudio真正适配用户的核心文件，包含 `taste.md`、`routines.md`、`playlists.json`、`mood-rules.md` |
+| BRAIN Claude Code | AI核心大脑 | 子进程调用能力，支持用Max订阅无需API key，核心指令 `claude -p`、`--output json` |
+| MUSIC NeteaseCloudMusicApi | 音乐能力底座 | 提供歌曲检索、直链、歌词、推荐能力，核心接口 `search`、`song_url`、`lyric`、`recommend` |
+| VOICE · I/O | 语音与外设交互入口 | 对接声音、日程、天气、客厅功放能力，覆盖 `Fish`、`Feishu`、`Weather`、`UPnP`，核心组件 `fish tts`、`lark`、`weather`、`Naim` |
+
+---
+
+## 第二层：本地大脑层
+承接外部能力，完成本地的意图分流、逻辑编排、状态管理与调度，是系统的核心逻辑中枢。
+1.  **ROUTER.JS 意图分流**：核心逻辑为简单指令直连、音乐能力走ncm、自然语言交互走claude
+2.  **CONTEXT.JS 提示词组装**：核心逻辑为 `taste + routines + 环境 + 历史 → system prompt`，完成prompt的动态拼接
+3.  **CLAUDE.JS 大脑适配器**：负责spawn子进程，解析AI返回的结构化内容 `{say, play[], reason, segue}`
+4.  **SCHEDULER.JS 节律调度**：内置定时任务，包含07:00规划、09:00早间、小时级情绪检查，同时支持日历hook触发
+5.  **TTS.JS 声音管线**：完成语音合成全链路，链路为 `Fish Audio → cache/tts/[hash].mp3 → /tts/[hash].mp3`
+6.  **STATE.DB 状态·记忆**：实现跨重启持久化，存储核心数据 `messages`、`plays`、`plan`、`prefs`
+
+---
+
+## 第三层：运行时聚合层
+每次交互触发时的运行时核心，完成prompt的最终组装与AI模型的前向执行，是单次请求的核心处理单元。
+### 1. CONTEXT WINDOW 组装盒子
+核心规则：每次触发按6个模块拼接成完整prompt，6个组成部分如下：
+- ① 系统提示词：`prompts/dj-persona.md`
+- ② 用户语料：`user/*.md`
+- ③ 环境注入：`weather`、`calendar`、`now`
+- ④ 已检索记忆：`state.db · plays`
+- ⑤ 用户输入/工具结果：`/api/chat`、`ncm search`
+- ⑥ 执行轨迹：`scheduler`、`webhook`
+
+### 2. MODEL 前向过程
+核心执行链路：
+`compute(fragments) → {say, play[], reason, segue} → ncm解析 queue · tts合成 say · WS 推送now-playing`
+
+---
+
+## 第四层：交互表层
+用户侧的前端交互与前后端通信层，实现用户可感知的交互与数据流转。
+1.  **PWA/ · LOCALHOST:8080 Progressive Web App**
+    前端核心架构：Player/Profile/Settings 三视图、单``音频组件、WS流式聊天、sw缓存壳层、音频预加载 `prefetch 10s`
+2.  **HTTP CONTRACT PWA ↔ server的6条通信链路**
+    前后端核心接口：
+    - `POST /api/chat`
+    - `GET /api/now`
+    - `GET /api/next`
+    - `GET /api/taste`
+    - `GET /api/plan/today`
+    - `WS /stream`
