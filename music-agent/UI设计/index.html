@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingody Music Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background atmosphere -->
+    <div class="bg-texture"></div>
+    <div class="bg-gradient"></div>
+
+    <!-- Main Terminal Container -->
+    <div class="terminal" id="terminal">
+        <!-- Title Bar -->
+        <header class="terminal-header">
+            <div class="terminal-title">
+                <span class="title-icon">▶</span>
+                <span id="terminal-title-text">Bingody Music Agent</span>
+                <span class="title-version">v1.0</span>
+            </div>
+            <div class="terminal-controls">
+                <button class="ctrl-btn ctrl-minimize" title="最小化" data-action="minimize">
+                    <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0" y="4" width="10" height="2" fill="currentColor"/></svg>
+                </button>
+                <button class="ctrl-btn ctrl-maximize" title="最大化" data-action="maximize">
+                    <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0" y="0" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button class="ctrl-btn ctrl-close" title="关闭" data-action="close">
+                    <svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Terminal Body: 3-Column Layout -->
+        <div class="terminal-body">
+            <!-- Left: Mascot Zone -->
+            <aside class="mascot-zone" id="mascot-zone">
+                <div class="bingody-container">
+                    <!-- SVG Sprite Container -->
+                    <div class="bingody-sprite" id="bingody-sprite">
+                        <!-- Default Idle State -->
+                        <svg class="bingody-svg" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(10,10)">
+                                <!-- Body layers -->
+                                <rect x="50" y="80" width="150" height="40" fill="#d8b83a" rx="10"/>
+                                <rect x="60" y="60" width="130" height="30" fill="#d8b83a" rx="10"/>
+                                <rect x="70" y="45" width="110" height="25" fill="#d8b83a" rx="10"/>
+                                <!-- Face details -->
+                                <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826"/>
+                                <!-- Eyes -->
+                                <g class="bingody-eyes" transform="translate(100, 75)">
+                                    <rect class="eye-left" x="0" y="0" width="10" height="10" fill="#000" rx="2"/>
+                                    <rect class="eye-right" x="40" y="0" width="10" height="10" fill="#000" rx="2"/>
+                                    <rect class="mouth" x="20" y="25" width="10" height="5" fill="#000" rx="1"/>
+                                    <rect class="blush blush-left" x="-5" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                    <rect class="blush blush-right" x="45" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                </g>
+                                <!-- Headphones -->
+                                <g class="headphones" transform="translate(15, 60)">
+                                    <path d="M 20 0 Q 125 -60 230 0" stroke="#d8b83a" stroke-width="6" fill="none"/>
+                                    <g class="headphone-left" transform="translate(0, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#ee5555" rx="2" class="glow-pulse"/>
+                                    </g>
+                                    <g class="headphone-right" transform="translate(230, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#ee5555" rx="2" class="glow-pulse"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- State: Play (wavy animation via CSS) -->
+                        <svg class="bingody-svg state-play" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                            <g transform="translate(10,10)">
+                                <rect x="50" y="80" width="150" height="40" fill="#d8b83a" rx="10"/>
+                                <rect x="60" y="60" width="130" height="30" fill="#d8b83a" rx="10"/>
+                                <rect x="70" y="45" width="110" height="25" fill="#d8b83a" rx="10"/>
+                                <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826"/>
+                                <g transform="translate(100, 75)">
+                                    <rect x="0" y="0" width="10" height="10" fill="#000" rx="2"/>
+                                    <rect x="40" y="0" width="10" height="10" fill="#000" rx="2"/>
+                                    <!-- Happy mouth -->
+                                    <path d="M 15 25 Q 25 35 35 25" stroke="#000" stroke-width="3" fill="none"/>
+                                    <rect x="-5" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                    <rect x="45" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                </g>
+                                <g transform="translate(15, 60)">
+                                    <path d="M 20 0 Q 125 -60 230 0" stroke="#d8b83a" stroke-width="6" fill="none"/>
+                                    <g transform="translate(0, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-pulse-fast"/>
+                                    </g>
+                                    <g transform="translate(230, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-pulse-fast"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- State: Search -->
+                        <svg class="bingody-svg state-search" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                            <g transform="translate(10,10)">
+                                <rect x="50" y="80" width="150" height="40" fill="#d8b83a" rx="10"/>
+                                <rect x="60" y="60" width="130" height="30" fill="#d8b83a" rx="10"/>
+                                <rect x="70" y="45" width="110" height="25" fill="#d8b83a" rx="10"/>
+                                <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826"/>
+                                <g transform="translate(100, 75)">
+                                    <!-- Searching eyes: ఠ_ఠ -->
+                                    <g class="search-eyes">
+                                        <rect x="0" y="0" width="10" height="10" fill="#000" rx="2" transform="rotate(-15 5 5)"/>
+                                        <rect x="40" y="0" width="10" height="10" fill="#000" rx="2" transform="rotate(15 45 5)"/>
+                                    </g>
+                                    <rect x="20" y="25" width="10" height="5" fill="#000" rx="1"/>
+                                    <rect x="-5" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                    <rect x="45" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3"/>
+                                </g>
+                                <g transform="translate(15, 60)">
+                                    <path d="M 20 0 Q 125 -60 230 0" stroke="#d8b83a" stroke-width="6" fill="none"/>
+                                    <g transform="translate(0, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-pulse"/>
+                                    </g>
+                                    <g transform="translate(230, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-pulse"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- State: Error -->
+                        <svg class="bingody-svg state-error" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                            <g transform="translate(10,10)">
+                                <rect x="50" y="80" width="150" height="40" fill="#ee5555" rx="10"/>
+                                <rect x="60" y="60" width="130" height="30" fill="#ee5555" rx="10"/>
+                                <rect x="70" y="45" width="110" height="25" fill="#ee5555" rx="10"/>
+                                <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826"/>
+                                <g transform="translate(100, 75)">
+                                    <!-- X_X eyes -->
+                                    <g class="error-eyes">
+                                        <path d="M 0 0 L 10 10 M 10 0 L 0 10" stroke="#000" stroke-width="2"/>
+                                        <path d="M 40 0 L 50 10 M 50 0 L 40 10" stroke="#000" stroke-width="2"/>
+                                    </g>
+                                    <rect x="20" y="25" width="10" height="5" fill="#000" rx="1"/>
+                                </g>
+                                <g transform="translate(15, 60)">
+                                    <path d="M 20 0 Q 125 -60 230 0" stroke="#ee5555" stroke-width="6" fill="none"/>
+                                    <g transform="translate(0, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#ff8888" rx="2"/>
+                                    </g>
+                                    <g transform="translate(230, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#ff8888" rx="2"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <!-- State: Chill -->
+                        <svg class="bingody-svg state-chill" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg" style="display:none">
+                            <g transform="translate(10,10)">
+                                <rect x="50" y="80" width="150" height="40" fill="#d8b83a" rx="10"/>
+                                <rect x="60" y="60" width="130" height="30" fill="#d8b83a" rx="10"/>
+                                <rect x="70" y="45" width="110" height="25" fill="#d8b83a" rx="10"/>
+                                <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826"/>
+                                <g transform="translate(100, 75)">
+                                    <!-- Chill eyes: ◡‿◡ -->
+                                    <path d="M 0 8 Q 5 2 10 8" stroke="#000" stroke-width="2" fill="none"/>
+                                    <path d="M 40 8 Q 45 2 50 8" stroke="#000" stroke-width="2" fill="none"/>
+                                    <path d="M 15 25 Q 25 32 35 25" stroke="#000" stroke-width="2" fill="none"/>
+                                    <rect x="-5" y="15" width="10" height="10" fill="rgba(255,150,150,0.6)" rx="3"/>
+                                    <rect x="45" y="15" width="10" height="10" fill="rgba(255,150,150,0.6)" rx="3"/>
+                                </g>
+                                <g transform="translate(15, 60)">
+                                    <path d="M 20 0 Q 125 -60 230 0" stroke="#d8b83a" stroke-width="6" fill="none"/>
+                                    <g transform="translate(0, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-soft"/>
+                                    </g>
+                                    <g transform="translate(230, 0)">
+                                        <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                        <rect x="-5" y="-5" width="20" height="20" fill="#2ad2d2" rx="2" class="glow-soft"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                    <!-- Floating notes decoration -->
+                    <div class="floating-notes">
+                        <span class="note note-1">♪</span>
+                        <span class="note note-2">♫</span>
+                        <span class="note note-3">♬</span>
+                    </div>
+                </div>
+                <!-- Speech Bubble -->
+                <div class="speech-bubble" id="speech-bubble">
+                    <p class="speech-text" id="speech-text">你好！我是 Bingody~ 有什么好听的吗？</p>
+                </div>
+            </aside>
+
+            <!-- Center: Main View -->
+            <main class="main-view" id="main-view">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <span class="search-prefix">/bingo</span>
+                        <input type="text" class="search-input" id="search-input" placeholder="输入指令或搜索音乐..." autocomplete="off">
+                        <button class="search-btn" id="search-btn" title="搜索">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="2"/>
+                                <path d="M10 10L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="content-area" id="content-area">
+                    <!-- Welcome / Now Playing -->
+                    <section class="content-section" id="welcome-section">
+                        <h1 class="main-title">BINGODY</h1>
+                        <h2 class="sub-title">music agent</h2>
+                        <div class="status-display">
+                            <div class="status-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="status-text">Loading Bingody Core</span>
+                                <span class="status-ok">[OK]</span>
+                            </div>
+                            <div class="status-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="status-text">Synced with '大饼'</span>
+                                <span class="status-ok">ACTIVE</span>
+                            </div>
+                            <div class="status-line">
+                                <span class="prompt">&gt;</span>
+                                <span class="status-text status-waiting">Awaiting command</span>
+                                <span class="cursor blink">_</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Search Results (hidden by default) -->
+                    <section class="content-section search-results hidden" id="search-results-section">
+                        <div class="results-header">
+                            <h3>搜索结果</h3>
+                            <button class="btn-ghost btn-close" id="close-results-btn">×</button>
+                        </div>
+                        <ul class="results-list" id="results-list">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </section>
+
+                    <!-- Now Playing (hidden by default) -->
+                    <section class="content-section now-playing hidden" id="now-playing-section">
+                        <div class="now-playing-header">
+                            <div class="np-info">
+                                <h3 id="np-title">歌曲标题</h3>
+                                <p id="np-artist">艺术家</p>
+                            </div>
+                            <div class="np-controls">
+                                <button class="np-btn" id="np-prev" title="上一首">⏮</button>
+                                <button class="np-btn np-btn-main" id="np-play-pause" title="播放/暂停">▶</button>
+                                <button class="np-btn" id="np-next" title="下一首">⏭</button>
+                            </div>
+                        </div>
+                        <!-- Progress Bar -->
+                        <div class="progress-container">
+                            <span class="time-current" id="time-current">0:00</span>
+                            <div class="progress-bar" id="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                                <div class="progress-handle" id="progress-handle"></div>
+                            </div>
+                            <span class="time-total" id="time-total">0:00</span>
+                        </div>
+                        <!-- Spectrum -->
+                        <div class="spectrum-container" id="spectrum-container">
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                            <div class="spectrum-bar"></div><div class="spectrum-bar"></div><div class="spectrum-bar"></div>
+                        </div>
+                    </section>
+
+                    <!-- Playlist Queue -->
+                    <section class="content-section playlist hidden" id="playlist-section">
+                        <div class="playlist-header">
+                            <h3>播放队列</h3>
+                            <span class="playlist-count" id="playlist-count">0 首</span>
+                        </div>
+                        <ul class="playlist-list" id="playlist-list">
+                            <!-- Populated by JS -->
+                        </ul>
+                    </section>
+                </div>
+
+                <!-- Command Hints -->
+                <div class="command-hints" id="command-hints">
+                    <span class="hint"><kbd>/bingo</kbd> <kbd>play</kbd> 播放</span>
+                    <span class="hint"><kbd>/bingo</kbd> <kbd>search</kbd> 搜索</span>
+                    <span class="hint"><kbd>/bingo</kbd> <kbd>feed</kbd> 喂食</span>
+                    <span class="hint"><kbd>/bingo</kbd> <kbd>mood</kbd> 心情</span>
+                </div>
+            </main>
+
+            <!-- Right: Jukebox Widget Panel -->
+            <aside class="jukebox-widget" id="jukebox-widget">
+                <!-- System Status -->
+                <div class="widget-section system-status">
+                    <h4 class="widget-title">系统状态</h4>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">网络</span>
+                            <span class="status-indicator online" id="net-status"></span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">播放</span>
+                            <span class="status-indicator" id="play-status"></span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">音量</span>
+                            <span class="status-value" id="volume-value">80%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="widget-section quick-actions">
+                    <h4 class="widget-title">快捷操作</h4>
+                    <div class="action-buttons">
+                        <button class="action-btn" data-action="play-pause" title="播放/暂停">
+                            <span class="action-icon">▶</span>
+                        </button>
+                        <button class="action-btn" data-action="next" title="下一首">
+                            <span class="action-icon">⏭</span>
+                        </button>
+                        <button class="action-btn" data-action="queue" title="播放队列">
+                            <span class="action-icon">☰</span>
+                        </button>
+                        <button class="action-btn" data-action="settings" title="设置">
+                            <span class="action-icon">⚙</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mood Selector -->
+                <div class="widget-section mood-selector">
+                    <h4 class="widget-title">心情模式</h4>
+                    <div class="mood-buttons">
+                        <button class="mood-btn" data-mood="chill" title="放松">😌</button>
+                        <button class="mood-btn" data-mood="energetic" title="活力">⚡</button>
+                        <button class="mood-btn" data-mood="focus" title="专注">🎯</button>
+                        <button class="mood-btn" data-mood="sleepy" title="助眠">😴</button>
+                    </div>
+                </div>
+
+                <!-- Recent Commands Log -->
+                <div class="widget-section command-log">
+                    <h4 class="widget-title">最近指令</h4>
+                    <ul class="log-list" id="command-log">
+                        <li class="log-entry log-system">系统启动完成</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="terminal-input">
+            <div class="input-wrapper">
+                <span class="input-prefix" id="input-prefix">/bingo</span>
+                <input type="text" class="terminal-text-input" id="terminal-input" placeholder="输入指令..." autocomplete="off" spellcheck="false">
+                <button class="input-submit" id="submit-btn" title="执行">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2 7H12M12 7L7 2M12 7L7 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-hints">
+                <span class="input-hint">按 <kbd>Enter</kbd> 执行</span>
+                <span class="input-hint"><kbd>↑↓</kbd> 历史记录</span>
+                <span class="input-hint"><kbd>Tab</kbd> 补全</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Particle System Container -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

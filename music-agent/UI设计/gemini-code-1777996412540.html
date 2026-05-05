@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingody Music Agent CLI - 大饼's伙伴</title>
+    <style>
+        /* 应用一个类似Minecraft的像素字体 */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('https://i.imgur.com/8Q7P1Hw.png'); /* Minecraft石砖纹理 */
+            background-repeat: repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #f1f1f1;
+            font-family: 'VT323', monospace; /* 像素字体 */
+            overflow: hidden;
+        }
+
+        /* 终端窗口容器 */
+        .mc-terminal {
+            width: 800px;
+            height: 500px;
+            background-color: #000000;
+            border: 4px solid;
+            border-image: linear-gradient(#c6c6c6, #313131) 1; /* 经典的MC灰度像素边框 */
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        /* 终端标题栏 */
+        .terminal-header {
+            height: 30px;
+            background-color: #313131;
+            border-bottom: 2px solid #1e1e1e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .terminal-title {
+            color: #aaaaaa;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            background-color: #777777;
+            border: 1px solid #1e1e1e;
+        }
+
+        /* 终端主体内容（左右分栏） */
+        .terminal-body {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 左侧 Bingody 形象容器 */
+        .bingody-container {
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 使用 SVG 构建修改后的 Voxel Bingody，更像 Pancake */
+        #bingody-sprite {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 右侧文本区域 */
+        .text-container {
+            width: 420px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-right: 10px;
+            box-sizing: border-box;
+        }
+
+        .main-title {
+            color: #f1f1f1;
+            font-size: 4rem;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            text-shadow: 4px 4px #4a4a4a; /* 增加体素深度感 */
+        }
+
+        .sub-title {
+            color: #d8b83a; /* 金黄色 */
+            font-size: 2rem;
+            margin: 0 0 20px 0;
+            text-transform: uppercase;
+        }
+
+        /* 模拟终端命令行输出 */
+        .status-lines {
+            font-size: 1.3rem;
+            color: #bbbbbb;
+            line-height: 1.5;
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid #313131;
+            padding-top: 10px;
+        }
+
+        .prompt {
+            color: #2ad2d2; /* 青色提示符 */
+        }
+
+        .status-loaded {
+            color: #2ad2d2; /* 加载成功 */
+        }
+
+        /* 动态闪烁的光标 */
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* 动态飘过的粒子（音符） */
+        .particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #d8b83a;
+            border-radius: 2px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="mc-terminal">
+        <div class="terminal-header">
+            <span class="terminal-title">Bingody Music Agent CLI v1.1 [大饼's CLI]</span>
+            <div class="terminal-controls">
+                <div class="terminal-btn"></div>
+                <div class="terminal-btn"></div>
+                <div class="terminal-btn"></div>
+            </div>
+        </div>
+        <div class="terminal-body">
+            <div class="bingody-container">
+                <div id="bingody-sprite">
+                    <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="translate(10,10)">
+                            <rect x="50" y="80" width="150" height="40" fill="#d8b83a" rx="10"/> <rect x="60" y="60" width="130" height="30" fill="#d8b83a" rx="10"/> <rect x="70" y="45" width="110" height="25" fill="#d8b83a" rx="10"/> <path d="M 75 50 L 175 50 L 165 60 L 150 55 L 140 65 L 125 60 L 115 70 L 100 65 L 90 75 Z" fill="#6d4826" />
+                            <rect x="115" y="30" width="30" height="15" fill="#ffffff" rx="3"/>
+                            
+                            <g transform="translate(100, 75)">
+                                <rect x="0" y="0" width="10" height="10" fill="#000" rx="2" />
+                                <rect x="40" y="0" width="10" height="10" fill="#000" rx="2" />
+                                <rect x="20" y="25" width="10" height="5" fill="#000" rx="1" /> <rect x="-5" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3" />
+                                <rect x="45" y="15" width="10" height="10" fill="rgba(255,100,100,0.5)" rx="3" />
+                            </g>
+
+                            <g transform="translate(15, 60)">
+                                <path d="M 20 0 Q 125 -60 230 0" stroke="#d8b83a" stroke-width="6" fill="none" />
+                                <g transform="translate(0, 0)">
+                                    <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                    <rect x="-5" y="-5" width="20" height="20" fill="#ee5555" rx="2">
+                                        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                                    </rect>
+                                </g>
+                                <g transform="translate(230, 0)">
+                                    <rect x="-10" y="-10" width="30" height="30" fill="#aa3333" rx="4"/>
+                                    <rect x="-5" y="-5" width="20" height="20" fill="#ee5555" rx="2">
+                                        <animate attributeName="opacity" values="1;0.3;1" dur="2.1s" repeatCount="indefinite" />
+                                    </rect>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="text-container">
+                <h1 class="main-title">BINGODY</h1>
+                <h2 class="sub-title">music agent</h2>
+                <div class="status-lines">
+                    > Loading Bingody Core v2.0 <span class="status-loaded">[OK]</span><br>
+                    > Sync with '大饼' ACTIVE <span class="status-loaded">[OK]</span><br>
+                    > Awaiting command...<span class="blink">_</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const body = document.querySelector('.mc-terminal .terminal-body');
+        const colors = ['#d8b83a', '#2ad2d2', '#ee5555']; // 粒子颜色
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // 随机大小
+            const size = Math.random() * 10 + 6;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 随机起始位置 (主要从Bingody或文本周围开始)
+            const startX = (Math.random() * 0.4 + 0.1) * 800; // Left side mostly
+            const startY = (Math.random() * 0.5 + 0.25) * 500;
+            particle.style.left = startX + 'px';
+            particle.style.top = startY + 'px';
+
+            body.appendChild(particle);
+
+            // 动画
+            const duration = Math.random() * 4 + 2;
+            particle.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 0 },
+                { transform: 'translate(0, 0) scale(1)', opacity: 1, offset: 0.1 },
+                { transform: `translate(${(Math.random() - 0.5) * 200}px, ${(Math.random() - 1) * 300}px) scale(0.1)`, opacity: 0 }
+            ], {
+                duration: duration * 1000,
+                easing: 'ease-out',
+                fill: 'forwards'
+            }).onfinish = () => {
+                particle.remove();
+            };
+        }
+
+        // 定期创建粒子
+        setInterval(createParticle, 300);
+    </script>
+</body>
+</html>

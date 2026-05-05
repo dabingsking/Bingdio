@@ -1,0 +1,50 @@
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+*.egg
+
+# Logs & DB
+*.log
+*.db
+memory/*.db
+
+# Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Temp files
+tmp/
+.DS_Store
+*.tmp
+
+# IDE
+.obsidian/
+.idea/
+.vscode/
+*.swp
+
+# OS
+Thumbs.db
+
+# Playwright
+.playwright-mcp/
+
+# Build artifacts
+ffmpeg/
+
+# Personal notes
+*.md
+!README.md

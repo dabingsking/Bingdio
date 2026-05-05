@@ -1,0 +1,31 @@
+llm:
+  base_url: "https://your-llm-endpoint.com/v1"
+  model: "your-model"
+  api_key: "YOUR_API_KEY_HERE"
+
+tts:
+  base_url: "https://your-tts-endpoint.com/v1"
+  endpoint: "/audio/speech"
+
+weather:
+  host: "your-weather-host.com"
+  key: "YOUR_WEATHER_KEY_HERE"
+  location: "101030100"
+
+netease:
+  base_url: "https://api.your-netease-proxy.com/api/cloudmusic"
+
+netease_app:
+  app_id: "YOUR_APP_ID_HERE"
+  private_key: "YOUR_PRIVATE_KEY_HERE"
+
+player:
+  auto_switch_interval: 0
+
+database:
+  path: "memory/bingdio.db"
+
+log:
+  level: "INFO"
+  max_bytes: 10485760
+  backup_count: 5
